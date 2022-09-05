@@ -1,0 +1,18 @@
+## This yaml is used to set values in openyurt/openyurt helm chart,
+## see: https://openyurtio.github.io/openyurt-helm
+
+yurtControllerManager:
+  image:
+    tag: latest
+
+yurtTunnelAgent:
+  parameters:
+    tunnelserverAddr: {{ .YurttunnelServerAddress }}:31008
+  image:
+    tag: latest
+
+yurtTunnelServer:
+  parameters:
+    certIps: {{ .YurttunnelServerAddress }}
+  image:
+    tag: latest

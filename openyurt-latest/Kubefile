@@ -1,0 +1,18 @@
+FROM kubernetes:v1.22.8-alpine
+
+RUN wget https://aliacs-edge-k8s-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/public/pkg/openyurt/cni/v0.8.0/cni-plugins-linux-amd64-v0.8.0.tgz \
+  && mkdir cni \
+  && tar -xf cni-plugins-linux-amd64-v0.8.0.tgz -C cni/
+COPY init-kube.sh scripts
+
+COPY etc etc
+COPY yamls/* manifests
+
+COPY helm-v3.9.4-linux-amd64.tar.gz .
+
+COPY install.sh .
+COPY kube-apiserver.sh .
+COPY kube-controller-manager.sh .
+RUN chmod 777 install.sh kube-apiserver.sh kube-controller-manager.sh
+
+CMD ./install.sh

@@ -1,0 +1,27 @@
+name: Generate OpenYurt Cluster Image
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: src/github.com/buildimage
+
+      - name: Install sealer
+        run: |
+          sudo wget https://github.com/sealerio/sealer/releases/download/v0.8.5/sealer-v0.8.5-linux-amd64.tar.gz && sudo tar -zxvf sealer-v0.8.5-linux-amd64.tar.gz -C /usr/bin
+          sudo sealer version
+
+      - name: Build Cluster Image
+        working-directory: src/github.com/buildimage/openyurt-latest
+        run: sudo sealer build -t openyurt-cluster:latest -f Kubefile .
+
+      - name: Push Cluster Image to Dockerhub
+        run: |
+          sudo sealer login registry-1.docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          sudo sealer tag openyurt-cluster:latest registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/openyurt-cluster:latest
+          sudo sealer push registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/openyurt-cluster:latest
